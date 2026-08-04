@@ -33,7 +33,7 @@ SARGAP busca automatizar una parte de estos procesos y centralizar la informaci�
 
 ## 3. Concepto general de funcionamiento
 
-SARGAP se basa en la interacción entre personas, dispositivos físicos, espacios y un sistema central de software.
+SARGAP se basa en la interacción entre personas, dispositivos físicos (lectores de identificación, cerraduras electrónicas, etc.), espacios (aulas, oficinas, laboratorios, etc.) y un sistema central de software(SARGAP).
 
 Una persona puede identificarse mediante un mecanismo de identificación compatible con SARGAP. El sistema debe poder determinar quién es la persona, qué dispositivo o espacio está involucrado y qué condiciones se aplican en ese momento.
 
