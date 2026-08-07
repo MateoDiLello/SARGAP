@@ -180,10 +180,10 @@ Las tecnologías que todavía no hayan sido validadas mediante los requisitos y 
 | Identificación futura      | Biometría          | A evaluar                 |
 | Firmware                   | C++                | Por confirmar             |
 | Entorno firmware           | PlatformIO         | Por confirmar             |
-| Comunicación               | Por decidir        | Pendiente                 |
-| Backend                    | java               | Pendiente                 |
+| Comunicación               | HTTP o HTTPS        | por confirmar                 |
+| Backend                    | java               | por confirmar                 |
 | Base de datos              | MySQL              | Por confirmar             |
-| Frontend                   | Por decidir        | Pendiente                 |
+| Frontend                   | HTML, CSS, JS, FrameWork a decidir        | por decidir                 |
 | Control de versiones       | Git                | Seleccionado              |
  
 

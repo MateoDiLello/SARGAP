@@ -262,3 +262,27 @@ Su propósito es demostrar que el núcleo fundamental del sistema es viable:
 > **Identificar una persona, procesar su solicitud, registrar el acontecimiento y comunicar el resultado.**
 
 Las decisiones técnicas tomadas durante el desarrollo deberán procurar que este núcleo pueda evolucionar posteriormente hacia un sistema con múltiples dispositivos, métodos de identificación, espacios, organizaciones y funcionalidades específicas.
+
+
+## 13 Prueba vertical del MVP
+
+La validación principal del MVP consistirá en demostrar un flujo completo
+desde la identificación hasta la consulta del evento registrado.
+
+### Caso 1 — Identificación permitida
+
+RFID registrado
+→ identificación de persona
+→ autorización permitida
+→ evento registrado
+→ LED verde
+→ evento visible en la web
+
+### Caso 2 — Identificación denegada
+
+RFID desconocido
+→ identificación no válida
+→ autorización denegada
+→ evento registrado
+→ LED rojo + buzzer
+→ evento visible en la web
