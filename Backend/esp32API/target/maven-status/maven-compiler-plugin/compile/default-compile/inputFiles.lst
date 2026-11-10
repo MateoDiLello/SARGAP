@@ -1,0 +1,4 @@
+/home/mateo/IdeaProjects/SargapExpo/Backend/esp32API/src/main/java/com.sargap/Esp32Api.java
+/home/mateo/IdeaProjects/SargapExpo/Backend/esp32API/src/main/java/com.sargap/controller/AccesoController.java
+/home/mateo/IdeaProjects/SargapExpo/Backend/esp32API/src/main/java/com.sargap/model/UsuarioRfid.java
+/home/mateo/IdeaProjects/SargapExpo/Backend/esp32API/src/main/java/com.sargap/repository/UsuarioRfidRepository.java
