@@ -37,3 +37,16 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+
+### Carpeta Firmware ###
+**/.env
+**/.pio/
+**/.vscode/
+
+### Secretos Backend ###
+**/application.properties
+**/application-local.properties
+
+
+**/target/**

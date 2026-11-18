@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>SARGAP - Panel de Control</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+  
+   <!-- HEADER -->
+  <header class="navbar">
+    <div class="navbar-left">
+      <div class="brand">
+        <img src="../img/logo.png" alt="Logo SARGAP" class="logo-img" onerror="this.style.display='none'">
+        <span class="brand-name">SARGAP</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="header-title">
+        <h1>Panel de Control</h1>
+      </div>
+    </div>
+
+    <div class="navbar-right">
+      <a href="about.html" class="nav-item">Sobre Nosotros</a>
+      <div class="user-profile">
+        <div class="avatar">D</div>
+        <span id="usuario-conectado"><strong>Director</strong></span>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- SECCIÓN 1: SISTEMA DE GESTIÓN DE USUARIOS -->
+  <div class="seccion-header">
+    <h2>Sistema de Gestión de Usuarios</h2>
+  </div>
+
+  <div class="tabla-card">
+    <table>
+      <thead>
+        <tr>
+          <th>UID</th>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Espacios Habilitados</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpo-usuarios">
+        <tr><td colspan="4">Cargando usuarios registrados...</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tabla-footer">
+      <span id="contador-usuarios">Mostrando 0 usuarios registrados</span>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: ÚLTIMOS REGISTROS (DATOS DEL ESP32 + RTC) -->
+  <div class="seccion-header">
+    <h2>Últimos Registros</h2>
+    <button id="btn-actualizar" class="btn-ver-todos">↻ Actualizar</button>
+  </div>
+
+  <div class="tabla-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha y Hora</th>
+          <th>UID</th>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Lector</th>
+          <th>Resultado</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpo-registros">
+        <tr><td colspan="6">Cargando últimos registros...</td></tr>
+      </tbody>
+    </table>
+
+
+    <div class="tabla-footer">
+      <span id="contador-registros">Mostrando 0 registros</span>
+      <div id="paginacion-registros" class="paginacion"></div>a
+    </div>
+
+  <script src="../js/app.js?v=2"></script>
+</body>
+</html>

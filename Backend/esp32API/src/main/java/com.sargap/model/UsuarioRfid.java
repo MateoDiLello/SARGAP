@@ -19,6 +19,8 @@ public class UsuarioRfid {
     @Column(nullable = false)
     private String nombre;
 
+    private String rol;
+
     // Constructor vacío requerido por JPA
     public UsuarioRfid() {}
 
@@ -31,6 +33,9 @@ public class UsuarioRfid {
 
     public boolean isTieneAcceso() { return tieneAcceso; }
     public void setTieneAcceso(boolean tieneAcceso) { this.tieneAcceso = tieneAcceso; }
+
+    public String getRol() { return rol; }
+    public void setRol(String rol) { this.rol = rol; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
