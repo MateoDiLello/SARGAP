@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre Nosotros — SARGAP</title>
+  <!-- Ajustá esta ruta si tu carpeta de estilos tiene otro nombre -->
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN (Igual a index.html) -->
+  <header class="navbar">
+    <div class="navbar-left">
+      <div class="brand">
+        <!-- Ajustá la ruta de tu logo si hace falta -->
+        <span class="brand-name">SARGAP</span>
+      </div>
+      <div class="divider"></div>
+      <div class="header-title">
+        <h1>Control de Acceso Institucional</h1>
+      </div>
+    </div>
+
+    <div class="navbar-right">
+      <a href="index.html" class="nav-item">Panel Principal</a>
+      <a href="about.html" class="nav-item" style="background-color: rgba(255,255,255,0.32); font-weight: 600;">Sobre Nosotros</a>
+      <div class="user-profile">
+        <div class="avatar">D</div>
+        <span>Director</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="about-container">
+
+    <!-- TARJETA DE PRESENTACIÓN DEL PROYECTO -->
+    <section class="about-hero-card">
+      <span class="about-pill">Proyecto Expo Técnica 2026</span>
+      <h2>Modernizando la seguridad y gestión escolar con IoT</h2>
+      <p>
+        <strong>SARGAP</strong> (Sistema de Acceso y Registro con Gestión Automatizada de Personas) nació con el objetivo de reemplazar los registros manuales en papel por una plataforma integral, rápida y auditable. Combina lectores RFID autónomos con una arquitectura cliente-servidor en tiempo real para administrar quién ingresa a cada sector de la institución.
+      </p>
+
+      <!-- 3 PILARES TECNOLÓGICOS -->
+      <div class="pillars-grid">
+        <div class="pillar-item">
+          <div class="pillar-icon">📡</div>
+          <h3>Hardware & IoT</h3>
+          <p>Nodos lectores con microcontroladores <strong>ESP32</strong>, sensores RFID MFRC522 y reloj en tiempo real (RTC DS3231) con respuesta sonora y visual inmediata.</p>
+        </div>
+        <div class="pillar-item">
+          <div class="pillar-icon">⚙️</div>
+          <h3>Backend & Datos</h3>
+          <p>API REST desarrollada en <strong>Java con Spring Boot</strong> y base de datos relacional <strong>PostgreSQL</strong> para validar permisos granulares por sala al instante.</p>
+        </div>
+        <div class="pillar-item">
+          <div class="pillar-icon">💻</div>
+          <h3>Gestión Web</h3>
+          <p>Interfaz intuitiva y responsiva que permite auditar ingresos en vivo, capturar tarjetas nuevas y asignar roles o sectores sin conocimientos técnicos.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN DEL EQUIPO -->
+    <div class="seccion-header">
+      <h2>Equipo de Desarrollo</h2>
+    </div>
+
+    <section class="team-grid">
+      <!-- INTEGRANTE 1: MATEO -->
+      <article class="team-card">
+        <div class="team-header">
+          <div class="team-avatar avatar-mateo">MD</div>
+          <div>
+            <h3>Mateo Di Lello</h3>
+            <span class="team-role">Desarrollo Full Stack, Backend & Arquitectura IoT</span>
+          </div>
+        </div>
+        <p class="team-bio">
+          Encargado del diseño de la arquitectura del sistema, desarrollo de la API REST en Java/Spring Boot, integración con PostgreSQL, firmware de comunicación del ESP32 y lógica de la interfaz web.
+        </p>
+        <div class="team-tags">
+          <span class="mini-badge-espacio">Java / Spring Boot</span>
+          <span class="mini-badge-espacio">PostgreSQL</span>
+          <span class="mini-badge-espacio">ESP32 / C++</span>
+          <span class="mini-badge-espacio">HTML / CSS / JS</span>
+          <span class="mini-badge-espacio">Documentación Técnica</span>
+
+        </div>
+        <div class="team-links">
+          <a href="https://github.com/MateoDiLello" target="_blank" rel="noopener noreferrer" class="btn-editar-tabla" style="text-decoration: none;">
+            GitHub
+          </a>
+          <a href="https://www.linkedin.com/in/mateo-di-lello-48b751427" target="_blank" rel="noopener noreferrer" class="btn-editar-tabla" style="text-decoration: none;">
+            LinkedIn
+          </a>
+
+          <a href="https://github.com/MateoDiLello/SARGAP" target="_blank" rel="noopener noreferrer" class="btn-secundario" style="text-decoration: none; padding: 6px 12px; font-size: 0.8rem;">
+            Repositorio SARGAP
+          </a>
+        
+
+        </div>
+      </article>
+
+      <!-- INTEGRANTE 2: TOMÁS -->
+      <article class="team-card">
+        <div class="team-header">
+          <div class="team-avatar avatar-tomas">TM</div>
+          <div>
+            <h3>Tomás Miguel</h3>
+            <span class="team-role">Hardware, Electrónica & Diseño de PCB</span>
+          </div>
+        </div>
+        <p class="team-bio">
+          Responsable del diseño electrónico, ensamblado de circuitos de lectura RFID, pruebas de campo, integración de componentes físicos y validación funcional del sistema institucional.
+        </p>
+        <div class="team-tags">
+          <span class="mini-badge-espacio">Electrónica</span>
+          <span class="mini-badge-espacio">Hardware / PCB</span>
+          <span class="mini-badge-espacio">Testing</span>
+          <span class="mini-badge-espacio">Documentación</span>
+          <span class="mini-badge-espacio">Diseño 3D</span>
+        </div>
+        <div class="team-links">
+          <a href="https://www.instagram.com/tom_mig_/" target="_blank" rel="noopener noreferrer" class="btn-editar-tabla" style="text-decoration: none;">
+            Instagram
+          </a>
+        </div>
+      </article>
+    </section>
+
+  </main>
+
+</body>
+</html>

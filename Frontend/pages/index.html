@@ -27,6 +27,7 @@
     </div>
 
     <div class="navbar-right">
+      <a href="index.html" class="nav-item">Panel Principal</a>
       <a href="about.html" class="nav-item">Sobre Nosotros</a>
       <div class="user-profile">
         <div class="avatar">D</div>
@@ -50,14 +51,16 @@
 
       <div class="form-group">
         <label for="input-uid">UID Tarjeta (Hex) *</label>
-        <div style="display: flex; gap: 6px;">
-          <input type="text" id="input-uid" class="form-control input-uppercase" placeholder="Ej: A3B2C1D0">
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <input type="text" id="input-uid" class="form-control input-uppercase" placeholder="Ej: A3B2C1D0"
+            style="flex: 1; min-width: 115px;">
           <button type="button" id="btn-capturar-uid" class="btn-secundario" title="Traer el último UID escaneado"
-            style="padding: 0 8px; white-space: nowrap;">
-            📡 Capturar
+            style="padding: 0 10px; font-size: 0.8rem; white-space: nowrap; flex-shrink: 0;">
+            Capturar
           </button>
         </div>
       </div>
+
       <div class="form-group">
         <label for="input-rol">Rol</label>
         <select id="input-rol" class="form-control">
@@ -176,28 +179,29 @@
         <label class="modal-check-activo">
           <input type="checkbox" id="modal-tiene-acceso"> Tarjeta Activa (Habilitada para ingresar)
         </label>
-        
+
         <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 14px;">
-    
-        <div class="form-group">
-          <label for="modal-input-nombre">Nombre Completo</label>
-          <input type="text" id="modal-input-nombre" class="form-control">
-        </div>
-        <div class="form-group">
-          <label for="modal-input-uid">UID Tarjeta</label>
-          <input type="text" id="modal-input-uid" class="form-control input-uppercase">
-        </div>
+
+          <div class="form-group">
+            <label for="modal-input-nombre">Nombre Completo</label>
+            <input type="text" id="modal-input-nombre" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="modal-input-uid">UID Tarjeta</label>
+            <input type="text" id="modal-input-uid" class="form-control input-uppercase">
+          </div>
         </div>
 
-      <div class="modal-actions" style="justify-content: space-between;">
-        <button type="button" onclick="eliminarUsuarioActual()" style="padding: 8px 14px; background: #fde7e7; color: #c5221f; border: 1px solid #fecdd3; border-radius: 10px; font-weight: 600; cursor: pointer;">
-          Eliminar
-        </button>
-        <div style="display: flex; gap: 10px;">
-          <button type="button" class="btn-secundario" onclick="cerrarModalUsuario()">Cancelar</button>
-          <button type="button" class="btn-primario" onclick="guardarCambiosUsuario()">Guardar Cambios</button>
+        <div class="modal-actions" style="justify-content: space-between;">
+          <button type="button" onclick="eliminarUsuarioActual()"
+            style="padding: 8px 14px; background: #fde7e7; color: #c5221f; border: 1px solid #fecdd3; border-radius: 10px; font-weight: 600; cursor: pointer;">
+            Eliminar
+          </button>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn-secundario" onclick="cerrarModalUsuario()">Cancelar</button>
+            <button type="button" class="btn-primario" onclick="guardarCambiosUsuario()">Guardar Cambios</button>
+          </div>
         </div>
-      </div>
 
       </div>
     </div>
