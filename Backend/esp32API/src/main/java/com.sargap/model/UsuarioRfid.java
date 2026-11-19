@@ -21,7 +21,9 @@ public class UsuarioRfid {
 
     private String rol;
 
-    // Constructor vacío requerido por JPA
+    @Column(name = "espacios_habilitados")
+    private String espaciosHabilitados;
+
     public UsuarioRfid() {}
 
     // Getters y Setters
@@ -39,4 +41,7 @@ public class UsuarioRfid {
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getEspaciosHabilitados() { return espaciosHabilitados; }
+    public void setEspaciosHabilitados(String espaciosHabilitados) { this.espaciosHabilitados = espaciosHabilitados; }
 }

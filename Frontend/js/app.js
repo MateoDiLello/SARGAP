@@ -7,12 +7,36 @@ const REGISTROS_POR_PAGINA = 15;
 
 function obtenerClaseRol(rol) {
   const r = (rol || 'sin rol').toLowerCase();
-  if (r === 'docente') return 'rol-docente';
-  if (r === 'personal') return 'rol-personal';
-  if (r === 'preceptor') return 'rol-preceptor';
-  if (r === 'alumno') return 'rol-alumno';
+  if (r.includes('alumno')) return 'rol-alumno';
+  if (r.includes('docente') || r.includes('profesor')) return 'rol-docente';
+  if (r.includes('preceptor')) return 'rol-preceptor';
+  if (r.includes('personal')) return 'rol-personal';
+  if (r.includes('directivo') || r.includes('inspector')) return 'rol-directivo';
+  if (r.includes('visitante')) return 'rol-visitante';
   return 'rol-sin-rol';
 }
+
+function formatearFechaHora(fechaIso, claseDot = '') {
+  const dotHtml = claseDot ? `<span class="dot ${claseDot}" style="margin-right: 2px;"></span>` : '';
+  if (!fechaIso) return `<span class="fecha-contenedor">${dotHtml}<span class="fecha-dia">-</span></span>`;
+
+  const limpia = fechaIso.replace('T', ' ').slice(0, 19);
+  const [fechaParte, horaParte] = limpia.split(' ');
+
+  if (!fechaParte || !horaParte) return `<span class="fecha-contenedor">${dotHtml}<span class="fecha-dia">${limpia}</span></span>`;
+
+  const [anio, mes, dia] = fechaParte.split('-');
+  const horaCorta = horaParte.slice(0, 5);
+
+  return `
+    <span class="fecha-contenedor">
+      ${dotHtml}
+      <span class="fecha-dia">${dia}/${mes}/${anio}</span>
+      <span class="fecha-hora">${horaCorta} hs</span>
+    </span>
+  `;
+}
+
 
 // Descarga los registros desde Java (ya vienen ordenados del más nuevo al más viejo)
 async function cargarRegistros() {
@@ -62,11 +86,11 @@ function renderizarTablaRegistros() {
       ? `<span class="badge-resultado res-permitido">✔ Acceso Permitido</span>`
       : `<span class="badge-resultado res-denegado">✖ Acceso Denegado</span>`;
 
-    const fechaLimpia = reg.fechaHora ? reg.fechaHora.replace('T', ' ').slice(0, 19) : '-';
+    const fechaHtml = formatearFechaHora(reg.fechaHora);
 
     const fila = `
       <tr>
-        <td><span class="dot ${claseDot}"></span>${fechaLimpia}</td>
+        <td><span class="dot ${claseDot}"></span>${fechaHtml}</td>
         <td><code>${reg.uid || '-'}</code></td>
         <td><strong>${reg.usuario || 'Desconocido'}</strong></td>
         <td><span class="badge-rol ${claseRol}">${reg.rol || 'Sin rol'}</span></td>
@@ -125,7 +149,9 @@ function renderizarBotonesPaginacion() {
   });
 }
 
-// Carga el padrón de tarjetas registradas desde AccesoController
+// Carga la lista de usuarios desde Java y los dibuja en la tabla
+// REEMPLAZÁ LA FUNCIÓN cargarUsuarios() POR ESTA COMPLETA O AJUSTÁ EL BUCLE:
+
 async function cargarUsuarios() {
   const tbody = document.getElementById('cuerpo-usuarios');
 
@@ -138,36 +164,223 @@ async function cargarUsuarios() {
     usuarios.forEach(u => {
       const claseDot = u.tieneAcceso ? 'dot-verde' : 'dot-rojo';
       const claseRol = obtenerClaseRol(u.rol);
+      const userJson = encodeURIComponent(JSON.stringify(u));
+
+      // --- LÓGICA NUEVA PARA CÁPSULA INTERACTIVA ---
+      const espaciosTexto = u.espaciosHabilitados || 'Acceso General';
+      const listaEspacios = espaciosTexto.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+      let columnaEspaciosHtml = '';
+
+      if (listaEspacios.includes('Acceso Total')) {
+        columnaEspaciosHtml = `<span class="mini-badge-espacio total">✨ Acceso Total</span>`;
+      } else {
+        const badgesHtml = listaEspacios
+          .map(espacio => `<span class="mini-badge-espacio">${espacio}</span>`)
+          .join('');
+
+        columnaEspaciosHtml = `
+          <div class="espacios-wrapper">
+            <button type="button" class="btn-espacios-pill" onclick="toggleEspacios(this)">
+              <span>Espacios</span>
+              <span class="pill-count">${listaEspacios.length}</span>
+              <svg class="pill-chevron" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <div class="espacios-panel">
+              <div class="badge-espacios-container">
+                ${badgesHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      // ----------------------------------------
 
       const fila = `
         <tr>
           <td><span class="dot ${claseDot}"></span>${u.uid || '-'}</td>
           <td><strong>${u.nombre || 'Sin nombre'}</strong></td>
           <td><span class="badge-rol ${claseRol}">${u.rol || 'Sin rol'}</span></td>
-          <td>${u.espaciosHabilitados || 'Acceso General'}</td>
+          <td>${columnaEspaciosHtml}</td>
+          <td>
+            <button type="button" onclick="abrirModalUsuario('${userJson}')" class="btn-editar-tabla">
+              Editar
+            </button>
+          </td>
         </tr>
       `;
       tbody.innerHTML += fila;
     });
+
 
     document.getElementById('contador-usuarios').textContent =
       `Mostrando ${usuarios.length} usuarios registrados`;
 
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
-    tbody.innerHTML = '<tr><td colspan="4">No se pudieron cargar los datos del servidor.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5">No se pudieron cargar los datos del servidor.</td></tr>';
   }
 }
+
+
+function abrirModalUsuario(userEncoded) {
+  const u = JSON.parse(decodeURIComponent(userEncoded));
+  document.getElementById('modal-usuario-id').value = u.id;
+  document.getElementById('modal-nombre-usuario').textContent = u.nombre;
+  document.getElementById('modal-rol').value = u.rol || 'Visitante';
+  document.getElementById('modal-tiene-acceso').checked = u.tieneAcceso;
+
+  const actuales = (u.espaciosHabilitados || 'Acceso General').split(',').map(s => s.trim());
+  const chkTotal = document.getElementById('chk-acceso-total');
+  const chksIndividuales = document.querySelectorAll('.chk-espacio');
+
+  chkTotal.checked = actuales.includes('Acceso Total');
+  chksIndividuales.forEach(chk => {
+    chk.checked = !chkTotal.checked && actuales.includes(chk.value);
+    chk.disabled = chkTotal.checked;
+  });
+
+  document.getElementById('modal-editar-usuario').style.display = 'flex';
+}
+
+function cerrarModalUsuario() {
+  document.getElementById('modal-editar-usuario').style.display = 'none';
+}
+
+// Si se marca "Acceso Total", deshabilita los checkboxes individuales
+document.getElementById('chk-acceso-total')?.addEventListener('change', (e) => {
+  const marcado = e.target.checked;
+  document.querySelectorAll('.chk-espacio').forEach(chk => {
+    chk.disabled = marcado;
+    if (marcado) chk.checked = false;
+  });
+});
+
+async function guardarCambiosUsuario() {
+  const id = document.getElementById('modal-usuario-id').value;
+  const rol = document.getElementById('modal-rol').value;
+  const tieneAcceso = document.getElementById('modal-tiene-acceso').checked;
+
+  let espacios = [];
+  if (document.getElementById('chk-acceso-total').checked) {
+    espacios.push('Acceso Total');
+  } else {
+    document.querySelectorAll('.chk-espacio:checked').forEach(chk => espacios.push(chk.value));
+  }
+
+  const payload = {
+    rol: rol,
+    espaciosHabilitados: espacios.length > 0 ? espacios.join(', ') : 'Sin acceso',
+    tieneAcceso: tieneAcceso
+  };
+
+  try {
+    const resp = await fetch(`${API_BASE_URL}/acceso/usuarios/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (resp.ok) {
+      cerrarModalUsuario();
+      cargarUsuarios();
+    } else {
+      alert('Error al guardar los cambios en el servidor.');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('No se pudo conectar con la API.');
+  }
+}
+
+
+function mostrarMensajeFormulario(texto, esError) {
+  const msgEl = document.getElementById('mensaje-form-usuario');
+  msgEl.textContent = texto;
+  msgEl.style.color = esError ? '#dc2626' : '#16a34a';
+  msgEl.style.display = 'block';
+}
+
+function inicializarFormularioUsuario() {
+  const form = document.getElementById('form-nuevo-usuario');
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const nombre = document.getElementById('input-nombre').value.trim();
+    const apellido = document.getElementById('input-apellido').value.trim();
+    const uid = document.getElementById('input-uid').value.trim().toUpperCase();
+    const rol = document.getElementById('input-rol').value;
+
+    // 1. Validar campos vacíos en el navegador
+    if (!nombre || !apellido) {
+      mostrarMensajeFormulario('⚠️ Por favor completá Nombre/s y Apellido/s.', true);
+      return;
+    }
+    if (!uid) {
+      mostrarMensajeFormulario('⚠️ Debés ingresar el código UID de la tarjeta.', true);
+      return;
+    }
+
+    // 2. Enviar petición POST al backend
+    try {
+      const respuesta = await fetch(`${API_BASE_URL}/acceso/usuarios`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, apellido, uid, rol })
+      });
+
+      const data = await respuesta.json();
+
+      if (!respuesta.ok) {
+        // Muestra el error del servidor (ej: "Ese UID ya está registrado...")
+        mostrarMensajeFormulario(`✖ ${data.error || 'Error al registrar usuario.'}`, true);
+        return;
+      }
+
+      // 3. Éxito: limpiar formulario, mostrar mensaje y recargar la tabla
+      form.reset();
+      mostrarMensajeFormulario(`✔ Usuario ${data.nombre} registrado con Acceso General.`, false);
+      cargarUsuarios();
+
+    } catch (error) {
+      console.error('Error:', error);
+      mostrarMensajeFormulario('✖ No se pudo conectar con el servidor Java.', true);
+    }
+  });
+}
+
+
+function toggleEspacios(boton) {
+  const estabaAbierto = boton.classList.contains('abierto');
+
+  document.querySelectorAll('.btn-espacios-pill.abierto').forEach(btn => {
+    btn.classList.remove('abierto');
+    btn.nextElementSibling?.classList.remove('abierto');
+  });
+
+  if (!estabaAbierto) {
+    boton.classList.add('abierto');
+    boton.nextElementSibling?.classList.add('abierto');
+  }
+}
+
+
 
 // Inicialización al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
   cargarRegistros();
   cargarUsuarios();
+  inicializarFormularioUsuario(); // <-- ESTA LÍNEA ES OBLIGATORIA PARA QUE EL FORMULARIO FUNCIONE
 
   document.getElementById('btn-actualizar').addEventListener('click', () => {
     cargarRegistros();
     cargarUsuarios();
   });
 
-  setInterval(cargarRegistros, 1000);
+  setInterval(cargarRegistros, 3000); // Cada 3 segundos es ideal para ver lecturas en vivo sin saturar
 });
+

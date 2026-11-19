@@ -65,4 +65,58 @@ public class AccesoController {
         List<UsuarioRfid> usuarios = usuarioRfidRepository.findAll();
         return ResponseEntity.ok(usuarios);
     }
+    // 3. Endpoint para crear un nuevo usuario RFID desde la Web
+    @PostMapping("/usuarios")
+    public ResponseEntity<?> crearUsuario(@RequestBody Map<String, String> payload) {
+        String nombre = payload.get("nombre") != null ? payload.get("nombre").trim() : "";
+        String apellido = payload.get("apellido") != null ? payload.get("apellido").trim() : "";
+        String uid = payload.get("uid") != null ? payload.get("uid").trim().toUpperCase() : "";
+        String rol = payload.get("rol") != null ? payload.get("rol").trim() : "Visitante";
+
+        // Validación de campos obligatorios
+        if (nombre.isEmpty() || apellido.isEmpty() || uid.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Nombre, apellido y UID son obligatorios."));
+        }
+
+        // Validación de UID duplicado (ignorando mayúsculas/minúsculas)
+        if (usuarioRfidRepository.findByUidIgnoreCase(uid).isPresent()) {
+            return ResponseEntity.status(409).body(Map.of("error", "Ese UID ya está registrado en el sistema."));
+        }
+
+        UsuarioRfid nuevoUsuario = new UsuarioRfid();
+        nuevoUsuario.setNombre(nombre + " " + apellido);
+        nuevoUsuario.setUid(uid);
+        nuevoUsuario.setRol(rol);
+        nuevoUsuario.setEspaciosHabilitados("Acceso General"); // Solo baño y espacios comunes por defecto
+        nuevoUsuario.setTieneAcceso(true); // Activo para Acceso General
+
+        usuarioRfidRepository.save(nuevoUsuario);
+        return ResponseEntity.ok(nuevoUsuario);
+    }
+
+    // 4. Endpoint para editar rol, espacios habilitados y estado de acceso de un usuario
+    @PutMapping("/usuarios/{id}")
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+        Optional<UsuarioRfid> usuarioOpt = usuarioRfidRepository.findById(id);
+
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UsuarioRfid usuario = usuarioOpt.get();
+        if (payload.containsKey("rol")) {
+            usuario.setRol((String) payload.get("rol"));
+        }
+        if (payload.containsKey("espaciosHabilitados")) {
+            usuario.setEspaciosHabilitados((String) payload.get("espaciosHabilitados"));
+        }
+        if (payload.containsKey("tieneAcceso")) {
+            usuario.setTieneAcceso((Boolean) payload.get("tieneAcceso"));
+        }
+
+        usuarioRfidRepository.save(usuario);
+        return ResponseEntity.ok(usuario);
+    }
+
+
 }

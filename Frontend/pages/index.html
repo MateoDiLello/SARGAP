@@ -32,6 +32,42 @@
     </div>
   </header>
 
+  <!-- SECCIÓN: REGISTRAR NUEVO USUARIO -->
+<div class="form-card">
+  <form id="form-nuevo-usuario" class="form-grid">
+    <div class="form-group">
+      <label for="input-nombre">Nombre/s *</label>
+      <input type="text" id="input-nombre" class="form-control" placeholder="Ej: Mateo">
+    </div>
+
+    <div class="form-group">
+      <label for="input-apellido">Apellido/s *</label>
+      <input type="text" id="input-apellido" class="form-control" placeholder="Ej: Di Lello">
+    </div>
+
+    <div class="form-group">
+      <label for="input-uid">UID Tarjeta (Hex) *</label>
+      <input type="text" id="input-uid" class="form-control input-uppercase" placeholder="Ej: A3B2C1D0">
+    </div>
+
+    <div class="form-group">
+      <label for="input-rol">Rol</label>
+      <select id="input-rol" class="form-control">
+        <option value="Alumno">Alumno</option>
+        <option value="Docente">Profesor / Docente</option>
+        <option value="Preceptor">Preceptor</option>
+        <option value="Personal">Personal</option>
+        <option value="Visitante">Visitante</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <button type="submit" class="btn-primario">+ Registrar Usuario</button>
+    </div>
+  </form>
+  <p id="mensaje-form-usuario" class="mensaje-feedback"></p>
+</div>
+
 
   <!-- SECCIÓN 1: SISTEMA DE GESTIÓN DE USUARIOS -->
   <div class="seccion-header">
@@ -39,17 +75,18 @@
   </div>
 
   <div class="tabla-card">
-    <table>
+    <table id="tabla-usuarios">
       <thead>
         <tr>
           <th>UID</th>
           <th>Usuario</th>
           <th>Rol</th>
           <th>Espacios Habilitados</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody id="cuerpo-usuarios">
-        <tr><td colspan="4">Cargando usuarios registrados...</td></tr>
+        <tr><td colspan="5">Cargando usuarios registrados...</td></tr>
       </tbody>
     </table>
 
@@ -84,9 +121,52 @@
 
     <div class="tabla-footer">
       <span id="contador-registros">Mostrando 0 registros</span>
-      <div id="paginacion-registros" class="paginacion"></div>a
+      <div id="paginacion-registros" class="paginacion"></div>
     </div>
 
+    <!-- Modal para editar permisos -->
+<div id="modal-editar-usuario" class="modal-overlay">
+  <div class="modal-card">
+    <h3 class="modal-title">Editar Permisos: <span id="modal-nombre-usuario"></span></h3>
+    <input type="hidden" id="modal-usuario-id">
+
+    <div class="form-group" style="margin-bottom: 16px;">
+      <label for="modal-rol">Rol asignado</label>
+      <select id="modal-rol" class="form-control">
+        <option value="Alumno">Alumno</option>
+        <option value="Docente">Profesor / Docente</option>
+        <option value="Preceptor">Preceptor</option>
+        <option value="Personal">Personal</option>
+        <option value="Visitante">Visitante</option>
+        <option value="Directivo / Inspector">Directivo / Inspector</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Espacios Habilitados</label>
+      <div class="espacios-grid">
+        <label class="espacio-item total">
+          <input type="checkbox" id="chk-acceso-total"> Acceso Total (Directivos / Inspección)
+        </label>
+        <label class="espacio-item"><input type="checkbox" class="chk-espacio" value="Acceso General"> Acceso General</label>
+        <label class="espacio-item"><input type="checkbox" class="chk-espacio" value="Laboratorio"> Laboratorio</label>
+        <label class="espacio-item"><input type="checkbox" class="chk-espacio" value="Dirección"> Dirección</label>
+        <label class="espacio-item"><input type="checkbox" class="chk-espacio" value="Cocina"> Cocina</label>
+        <label class="espacio-item"><input type="checkbox" class="chk-espacio" value="Preceptoría"> Preceptoría</label>
+        <label class="espacio-item"><input type="checkbox" class="chk-espacio" value="Aula 1"> Aula 1</label>
+      </div>
+    </div>
+
+    <label class="modal-check-activo">
+      <input type="checkbox" id="modal-tiene-acceso"> Tarjeta Activa (Habilitada para ingresar)
+    </label>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-secundario" onclick="cerrarModalUsuario()">Cancelar</button>
+      <button type="button" class="btn-primario" onclick="guardarCambiosUsuario()">Guardar Cambios</button>
+    </div>
+  </div>
+</div>
   <script src="../js/app.js?v=2"></script>
 </body>
 </html>
