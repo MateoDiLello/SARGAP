@@ -129,16 +129,38 @@ public class AccesoController {
         return ResponseEntity.ok(nuevoUsuario);
     }
 
-    // 4. Endpoint para editar rol, espacios habilitados y estado de acceso de un usuario
+    // 4. Endpoint para editar Nombre, UID, Rol, Espacios y Estado
     @PutMapping("/usuarios/{id}")
     public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
         Optional<UsuarioRfid> usuarioOpt = usuarioRfidRepository.findById(id);
-
         if (usuarioOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         UsuarioRfid usuario = usuarioOpt.get();
+
+        // Validar y actualizar Nombre
+        if (payload.containsKey("nombre")) {
+            String nuevoNombre = ((String) payload.get("nombre")).trim();
+            if (nuevoNombre.isEmpty() || !nuevoNombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\\s]+$")) {
+                return ResponseEntity.badRequest().body(Map.of("error", "El nombre es obligatorio y solo admite letras."));
+            }
+            usuario.setNombre(nuevoNombre);
+        }
+
+        // Validar y actualizar UID (verificando que no esté repetido en OTRO usuario)
+        if (payload.containsKey("uid")) {
+            String nuevoUid = ((String) payload.get("uid")).trim().toUpperCase();
+            if (nuevoUid.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "El UID no puede quedar vacío."));
+            }
+            Optional<UsuarioRfid> existente = usuarioRfidRepository.findByUidIgnoreCase(nuevoUid);
+            if (existente.isPresent() && !existente.get().getId().equals(id)) {
+                return ResponseEntity.status(409).body(Map.of("error", "Ese UID ya pertenece a otro usuario."));
+            }
+            usuario.setUid(nuevoUid);
+        }
+
         if (payload.containsKey("rol")) {
             usuario.setRol((String) payload.get("rol"));
         }
@@ -153,5 +175,13 @@ public class AccesoController {
         return ResponseEntity.ok(usuario);
     }
 
-
+    // 5. Endpoint para eliminar un usuario por ID
+    @DeleteMapping("/usuarios/{id}")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
+        if (!usuarioRfidRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        usuarioRfidRepository.deleteById(id);
+        return ResponseEntity.ok(Map.of("mensaje", "Usuario eliminado correctamente"));
+    }
 }

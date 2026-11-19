@@ -229,6 +229,8 @@ function abrirModalUsuario(userEncoded) {
   const u = JSON.parse(decodeURIComponent(userEncoded));
   document.getElementById('modal-usuario-id').value = u.id;
   document.getElementById('modal-nombre-usuario').textContent = u.nombre;
+  document.getElementById('modal-input-nombre').value = u.nombre || '';
+  document.getElementById('modal-input-uid').value = u.uid || '';
   document.getElementById('modal-rol').value = u.rol || 'Visitante';
   document.getElementById('modal-tiene-acceso').checked = u.tieneAcceso;
 
@@ -243,6 +245,93 @@ function abrirModalUsuario(userEncoded) {
   });
 
   document.getElementById('modal-editar-usuario').style.display = 'flex';
+}
+
+function abrirModalUsuario(userEncoded) {
+  const u = JSON.parse(decodeURIComponent(userEncoded));
+  document.getElementById('modal-usuario-id').value = u.id;
+  document.getElementById('modal-nombre-usuario').textContent = u.nombre;
+  document.getElementById('modal-input-nombre').value = u.nombre || '';
+  document.getElementById('modal-input-uid').value = u.uid || '';
+  document.getElementById('modal-rol').value = u.rol || 'Visitante';
+  document.getElementById('modal-tiene-acceso').checked = u.tieneAcceso;
+
+  const actuales = (u.espaciosHabilitados || 'Acceso General').split(',').map(s => s.trim());
+  const chkTotal = document.getElementById('chk-acceso-total');
+  const chksIndividuales = document.querySelectorAll('.chk-espacio');
+
+  chkTotal.checked = actuales.includes('Acceso Total');
+  chksIndividuales.forEach(chk => {
+    chk.checked = !chkTotal.checked && actuales.includes(chk.value);
+    chk.disabled = chkTotal.checked;
+  });
+
+  document.getElementById('modal-editar-usuario').style.display = 'flex';
+}
+
+async function guardarCambiosUsuario() {
+  const id = document.getElementById('modal-usuario-id').value;
+  const nombre = document.getElementById('modal-input-nombre').value.trim();
+  const uid = document.getElementById('modal-input-uid').value.trim().toUpperCase();
+  const rol = document.getElementById('modal-rol').value;
+  const tieneAcceso = document.getElementById('modal-tiene-acceso').checked;
+
+  let espacios = [];
+  if (document.getElementById('chk-acceso-total').checked) {
+    espacios.push('Acceso Total');
+  } else {
+    document.querySelectorAll('.chk-espacio:checked').forEach(chk => espacios.push(chk.value));
+  }
+
+  const payload = {
+    nombre,
+    uid,
+    rol,
+    espaciosHabilitados: espacios.length > 0 ? espacios.join(', ') : 'Sin acceso',
+    tieneAcceso
+  };
+
+  try {
+    const resp = await fetch(`${API_BASE_URL}/acceso/usuarios/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await resp.json();
+    if (resp.ok) {
+      cerrarModalUsuario();
+      cargarUsuarios();
+    } else {
+      alert(data.error || 'Error al guardar los cambios.');
+    }
+  } catch (error) {
+    alert('No se pudo conectar con la API.');
+  }
+}
+
+async function eliminarUsuarioActual() {
+  const id = document.getElementById('modal-usuario-id').value;
+  const nombre = document.getElementById('modal-input-nombre').value;
+
+  if (!confirm(`¿Estás seguro de que querés eliminar a "${nombre}"? Esta acción no se puede deshacer.`)) {
+    return;
+  }
+
+  try {
+    const resp = await fetch(`${API_BASE_URL}/acceso/usuarios/${id}`, {
+      method: 'DELETE'
+    });
+
+    if (resp.ok) {
+      cerrarModalUsuario();
+      cargarUsuarios();
+    } else {
+      alert('No se pudo eliminar el usuario.');
+    }
+  } catch (error) {
+    alert('Error de conexión con el servidor.');
+  }
 }
 
 function cerrarModalUsuario() {
@@ -307,6 +396,21 @@ function inicializarFormularioUsuario() {
   const form = document.getElementById('form-nuevo-usuario');
   if (!form) return;
 
+  // 1. Botón para capturar el último UID leído por el ESP32 (afuera del submit)
+  const btnCapturar = document.getElementById('btn-capturar-uid');
+  if (btnCapturar) {
+    btnCapturar.addEventListener('click', async () => {
+      await cargarRegistros(); // Refresca para traer la última lectura al instante
+      if (todosLosRegistros.length > 0 && todosLosRegistros[0].uid) {
+        document.getElementById('input-uid').value = todosLosRegistros[0].uid;
+        mostrarMensajeFormulario(`📡 UID ${todosLosRegistros[0].uid} capturado de la última lectura.`, false);
+      } else {
+        mostrarMensajeFormulario('⚠️ Todavía no hay ninguna tarjeta escaneada en el historial.', true);
+      }
+    });
+  }
+
+  // 2. Envío del formulario para registrar usuario
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -315,7 +419,7 @@ function inicializarFormularioUsuario() {
     const uid = document.getElementById('input-uid').value.trim().toUpperCase();
     const rol = document.getElementById('input-rol').value;
 
-    // 1. Validar campos vacíos en el navegador
+    // Validar campos vacíos
     if (!nombre || !apellido) {
       mostrarMensajeFormulario('⚠️ Por favor completá Nombre/s y Apellido/s.', true);
       return;
@@ -324,16 +428,15 @@ function inicializarFormularioUsuario() {
       mostrarMensajeFormulario('⚠️ Debés ingresar el código UID de la tarjeta.', true);
       return;
     }
-        // Solo permite letras (incluyendo acentos y ñ) y espacios
-    const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
 
+    // Solo permite letras (incluyendo acentos y ñ) y espacios
+    const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
     if (!soloLetrasRegex.test(nombre) || !soloLetrasRegex.test(apellido)) {
       mostrarMensajeFormulario('⚠️ El nombre y el apellido solo pueden contener letras.', true);
       return;
     }
 
-
-    // 2. Enviar petición POST al backend
+    // Enviar petición POST al backend
     try {
       const respuesta = await fetch(`${API_BASE_URL}/acceso/usuarios`, {
         method: 'POST',
@@ -344,12 +447,10 @@ function inicializarFormularioUsuario() {
       const data = await respuesta.json();
 
       if (!respuesta.ok) {
-        // Muestra el error del servidor (ej: "Ese UID ya está registrado...")
         mostrarMensajeFormulario(`✖ ${data.error || 'Error al registrar usuario.'}`, true);
         return;
       }
 
-      // 3. Éxito: limpiar formulario, mostrar mensaje y recargar la tabla
       form.reset();
       mostrarMensajeFormulario(`✔ Usuario ${data.nombre} registrado con Acceso General.`, false);
       cargarUsuarios();
