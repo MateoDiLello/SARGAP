@@ -989,3 +989,67 @@ th,
   padding-top: 14px;
   border-top: 1px solid #f0f2f5;
 }
+
+/* Apila las tarjetas de equipo en la barra lateral izquierda */
+.team-sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.team-sidebar-list .team-card {
+  padding: 20px;
+}
+
+
+/* =========================================
+   14. LAYOUT DE DASHBOARD EN 2 COLUMNAS
+   ========================================= */
+.dashboard-layout {
+  max-width: 100%; /* Ocupa todo el ancho disponible, alineado con el navbar */
+  margin: 0;
+  display: grid;
+  grid-template-columns: 350px 1fr; /* 350px a la izquierda y todo el resto para las tablas */
+  gap: 28px;
+  align-items: start;
+}
+
+
+/* Barra lateral fija al hacer scroll */
+.dashboard-sidebar {
+  position: sticky;
+  top: 24px;
+}
+
+/* Dentro del sidebar, los campos del formulario se apilan verticalmente */
+.dashboard-sidebar .form-grid {
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.dashboard-sidebar .form-card,
+.dashboard-content .seccion-header,
+.dashboard-content .tabla-card {
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.dashboard-content .seccion-header:first-child {
+  margin-top: 0;
+}
+
+/* Responsive: en pantallas menores a 1024px vuelve a 1 sola columna */
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-sidebar {
+    position: static;
+  }
+
+  .dashboard-sidebar .form-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
