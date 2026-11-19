@@ -24,11 +24,11 @@ public class AccesoController {
     @Autowired
     private RegistroAccesoRepository registroAccesoRepository;
 
-    // 1. Endpoint para el ESP32: Verifica el UID y guarda el registro
+    // 1. Endpoint para el ESP32: Verifica el UID, valida permisos por sala y guarda el registro
     @PostMapping("/verificar")
     public ResponseEntity<Map<String, Object>> verificarAcceso(@RequestBody Map<String, String> request) {
         String uid = request.get("uid");
-        String lector = request.get("lector");
+        String lector = request.get("lector") != null ? request.get("lector").trim() : "Entrada Principal";
         String fechaHoraRtc = request.get("fechaHora");
 
         Map<String, Object> response = new HashMap<>();
@@ -36,18 +36,48 @@ public class AccesoController {
 
         boolean autorizado = false;
         String nombre = "Desconocido";
-        String rol = "Sin rol"; // Valor por defecto si la tarjeta no existe
+        String rol = "Sin rol";
         String mensaje = "Tarjeta no registrada";
 
         if (usuarioOpt.isPresent()) {
             UsuarioRfid usuario = usuarioOpt.get();
-            autorizado = usuario.isTieneAcceso();
             nombre = usuario.getNombre();
             rol = usuario.getRol() != null ? usuario.getRol() : "Sin rol";
-            mensaje = autorizado ? "Acceso Permitido" : "Acceso Denegado";
+
+            if (!usuario.isTieneAcceso()) {
+                autorizado = false;
+                mensaje = "Tarjeta deshabilitada";
+            } else {
+                String espaciosStr = usuario.getEspaciosHabilitados() != null ? usuario.getEspaciosHabilitados() : "";
+                List<String> espaciosList = java.util.Arrays.stream(espaciosStr.split(","))
+                        .map(String::trim)
+                        .map(String::toLowerCase)
+                        .toList();
+
+                String lectorNorm = lector.toLowerCase();
+
+                // Regla 1: Acceso Total (Directivos / Inspección) entra a cualquier lado
+                if (espaciosList.contains("acceso total")) {
+                    autorizado = true;
+                    mensaje = "Acceso Total Permitido";
+                }
+                // Regla 2: Entrada Principal / Acceso General (cualquier usuario activo puede ingresar al edificio)
+                else if (lectorNorm.equals("entrada principal") || lectorNorm.equals("acceso general")) {
+                    autorizado = !espaciosList.isEmpty() && !espaciosList.contains("sin acceso");
+                    mensaje = autorizado ? "Acceso Permitido" : "Sin espacios asignados";
+                }
+                // Regla 3: Sala específica (Laboratorio, Dirección, Cocina, Preceptoría, Aula 1)
+                else if (espaciosList.contains(lectorNorm)) {
+                    autorizado = true;
+                    mensaje = "Acceso Permitido a " + lector;
+                } else {
+                    autorizado = false;
+                    mensaje = "Sin permiso para " + lector;
+                }
+            }
         }
 
-        // Crea y guarda el registro en PostgreSQL usando tu constructor
+        // Crea y guarda el registro en PostgreSQL
         RegistroAcceso registro = new RegistroAcceso(uid, nombre, rol, lector, autorizado, fechaHoraRtc);
         registroAccesoRepository.save(registro);
 
@@ -58,7 +88,6 @@ public class AccesoController {
 
         return ResponseEntity.ok(response);
     }
-
     // 2. Endpoint para el Frontend Web: Lista todos los usuarios registrados
     @GetMapping("/usuarios")
     public ResponseEntity<List<UsuarioRfid>> listarUsuarios() {

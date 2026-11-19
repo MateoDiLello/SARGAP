@@ -131,7 +131,7 @@ void enviarUidAApi(String uid) {
   // 2. CREAR EL JSON COMPLETO CON UID, LECTOR Y FECHA
   JsonDocument docRequest; 
   docRequest["uid"] = uid; 
-  docRequest["lector"] = "Entrada Principal"; 
+  docRequest["lector"] = NOMBRE_LECTOR;
   docRequest["fechaHora"] = String(buffer);   
 
   String jsonPayload; 
