@@ -1,4 +1,4 @@
-# SARGAP — Sistema de Acceso y Registro con Gestión Automatizada de Permisos
+# SARGAP — Sistema de Acceso y Registro con Gestión Automatizada de Personas
 
 Sistema integral de control de acceso escolar basado en tecnología **RFID**, microcontroladores **ESP32**, una **API REST en Java (Spring Boot)**, base de datos **PostgreSQL** y un **panel web** de administración en tiempo real.
 
