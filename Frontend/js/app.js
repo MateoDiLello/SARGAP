@@ -324,6 +324,14 @@ function inicializarFormularioUsuario() {
       mostrarMensajeFormulario('⚠️ Debés ingresar el código UID de la tarjeta.', true);
       return;
     }
+        // Solo permite letras (incluyendo acentos y ñ) y espacios
+    const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+
+    if (!soloLetrasRegex.test(nombre) || !soloLetrasRegex.test(apellido)) {
+      mostrarMensajeFormulario('⚠️ El nombre y el apellido solo pueden contener letras.', true);
+      return;
+    }
+
 
     // 2. Enviar petición POST al backend
     try {

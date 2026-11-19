@@ -78,6 +78,12 @@ public class AccesoController {
             return ResponseEntity.badRequest().body(Map.of("error", "Nombre, apellido y UID son obligatorios."));
         }
 
+        // Verifica que nombre y apellido solo contengan letras, acentos, ñ y espacios
+        if (!nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\\s]+$") || !apellido.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\\s]+$")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El nombre y el apellido solo pueden contener letras."));
+        }
+
+
         // Validación de UID duplicado (ignorando mayúsculas/minúsculas)
         if (usuarioRfidRepository.findByUidIgnoreCase(uid).isPresent()) {
             return ResponseEntity.status(409).body(Map.of("error", "Ese UID ya está registrado en el sistema."));
